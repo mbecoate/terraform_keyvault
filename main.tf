@@ -3,18 +3,31 @@ data "azurerm_client_config" "current" {}
 data "azurerm_subnet" "default_subnet_data" {
   name                 = var.subnet1
   virtual_network_name = azurerm_virtual_network.Hub_Network.name
-  resource_group_name  = azurerm_resource_group.RG.name 
+  resource_group_name  = azurerm_resource_group.MattB_RG.name 
 }
 
-resource "azurerm_resource_group" "RG" {
-  name     = var.RG_name
+data "azurerm_key_vault" "mattbkeyvault" {
+  name = var.secret_vault_name
+  resource_group_name = var.secrets_rg_name
+  }
+data "azurerm_key_secret" "linux1_password" {
+  name = "linux1-password"
+  key_vault_id = data.azurerm_key_vault.mattbkeyvault.id
+  }
+data "azurerm_key_vault_secret" "linux1_username" {
+  name = "linux1-username"
+  key_vault_id = data.azurerm_key_vault.mattbkeyvault.id
+  }
+
+resource "azurerm_resource_group" "MattB_RG" {
+  name     = var.MattB_RG_name
   location = var.location
 }
 
 resource "azurerm_network_security_group" "Network_Security_Group" {
   name                = var.network_NSG
-  location            = azurerm_resource_group.RG.location
-  resource_group_name = azurerm_resource_group.RG.name
+  location            = azurerm_resource_group.MattB_RG.location
+  resource_group_name = azurerm_resource_group.MattB_RG.name
   security_rule {
     name                       = var.security_rule_name
     priority                   = var.security_rule_priority
@@ -30,8 +43,8 @@ resource "azurerm_network_security_group" "Network_Security_Group" {
 
 resource "azurerm_virtual_network" "Hub_Network" {
   name                = var.network_name
-  location            = azurerm_resource_group.RG.location
-  resource_group_name = azurerm_resource_group.RG.name
+  location            = azurerm_resource_group.MattB_RG.location
+  resource_group_name = azurerm_resource_group.MattB_RG.name
   address_space       = var.address_space
 
 
@@ -50,8 +63,8 @@ resource "azurerm_virtual_network" "Hub_Network" {
 
 resource "azurerm_public_ip" "linux1_pip" {
   name                = "${var.network_name}-linux1-pip"
-  resource_group_name = azurerm_resource_group.RG.name
-  location            = azurerm_resource_group.RG.location
+  resource_group_name = azurerm_resource_group.MattB_RG.name
+  location            = azurerm_resource_group.MattB_RG.location
   allocation_method   = var.linux1_pip_allocation_method
 
   tags = var.tags
@@ -59,8 +72,8 @@ resource "azurerm_public_ip" "linux1_pip" {
 
 resource "azurerm_network_interface" "linux1_nic" {
   name                = "${var.network_NSG}-${var.subnet1}-vmnic"
-  location            = azurerm_resource_group.RG.location
-  resource_group_name = azurerm_resource_group.RG.name
+  location            = azurerm_resource_group.MattB_RG.location
+  resource_group_name = azurerm_resource_group.MattB_RG.name
 
   ip_configuration {
     name                          = "internal"
@@ -72,8 +85,8 @@ resource "azurerm_network_interface" "linux1_nic" {
 
 resource "azurerm_virtual_machine" "linux1" {
   name                  = "${var.network_name}-${var.subnet1}-linux1"
-  location              = azurerm_resource_group.RG.location
-  resource_group_name   = azurerm_resource_group.RG.name
+  location              = azurerm_resource_group.MattB_RG.location
+  resource_group_name   = azurerm_resource_group.MattB_RG.name
   network_interface_ids = [azurerm_network_interface.linux1_nic.id]
   vm_size               = "Standard_B1s"
 

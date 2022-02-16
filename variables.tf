@@ -1,5 +1,5 @@
 #resource group variables
-variable "RG_name" {
+variable "MattB_RG_name" {
   type = string
 }
 variable "location" {

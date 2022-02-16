@@ -1,8 +1,8 @@
 terraform {
   backend "azurerm" {
-    resource_group_name  = "storage"
-    storage_account_name = "bjgstorage999"
-    container_name       = "terraform"
-    key                  = "keyvault_IaC"
+    resource_group_name  = "MattB_RG"
+    storage_account_name = "mattbstorageaccount"
+    container_name       = "mattbcontainer"
+    key                  = "mattbsecret"
   }
 }
