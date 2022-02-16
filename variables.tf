@@ -5,7 +5,12 @@ variable "MattB_RG_name" {
 variable "location" {
   type = string
 }
-
+variable "username" {
+  type = string
+}
+variable "password" {
+  type = string
+}
 #Networking Variables
 variable "network_NSG" {
   type = string
